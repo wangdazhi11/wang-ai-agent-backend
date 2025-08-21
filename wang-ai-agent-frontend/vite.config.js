@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8123',
+        target: 'https://wang-ai-agent-181111-5-1375050318.sh.run.tcloudbase.com',
         changeOrigin: true,
         headers: {
           'Accept': 'text/event-stream',
