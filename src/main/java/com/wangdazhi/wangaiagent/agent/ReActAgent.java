@@ -21,15 +21,16 @@ public abstract class ReActAgent extends BaseAgent {
      * @return
      */
     public abstract String act();
+    public abstract String present();
 
     @Override
     public String step() {
 
         try {
             if (think()) {
-                return act();
+                 return act();
             }
-            return "思考完成-结束行动";
+            return present();
         } catch (Exception e) {
             e.printStackTrace();
             return "发生错误-结束行动"+e.getMessage();

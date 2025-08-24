@@ -13,6 +13,7 @@ import io.reactivex.Completable;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -41,6 +42,9 @@ public abstract class BaseAgent {
 
     //LLM大模型
     private ChatClient chatClient;
+
+
+
 
     //上下文记忆(自主维护会话上下文)
     private List<Message> messageList = new ArrayList<>();
@@ -72,7 +76,7 @@ public abstract class BaseAgent {
                 log.info("当前步骤：{}/{}", currentStep,maxSteps);
                 String stepResult = step();
                 String Result = "步骤"+currentStep+": " + stepResult;
-                Results.add(stepResult);
+                Results.add(Result);
             }
             //检查是否超出步骤限制
             if (currentStep >= maxSteps) {

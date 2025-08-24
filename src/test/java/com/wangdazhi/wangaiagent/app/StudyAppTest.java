@@ -22,7 +22,7 @@ class StudyAppTest {
 
         String answer = studyApp.dochat("你好,我叫王大志",ChatID);
         // 第二轮
-        answer = studyApp.dochat("我想问考研电子信息基本上有哪几科目",ChatID);
+        answer = studyApp.dochat("我想问河海大学的研究生关于电子信息基本上有哪几科目，具体考哪些",ChatID);
         Assertions.assertNotNull(answer);
         // 第三轮
         answer = studyApp.dochat("这些科目有哪些考研名师",ChatID);
@@ -96,5 +96,9 @@ class StudyAppTest {
          */
         String answer = studyApp.dochatWithMcp("我想搜索一些图书馆的照片",ChatID);
         Assertions.assertNotNull(answer);
+    }
+
+    @Test
+    void dochatByStream() {
     }
 }

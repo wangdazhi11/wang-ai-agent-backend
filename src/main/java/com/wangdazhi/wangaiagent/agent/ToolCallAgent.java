@@ -7,7 +7,7 @@ import com.wangdazhi.wangaiagent.agent.model.AgentState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
+import opennlp.tools.util.StringUtil;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
@@ -21,7 +21,7 @@ import org.springframework.ai.tool.ToolCallback;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 
 /**
@@ -43,6 +43,7 @@ public class ToolCallAgent extends ReActAgent {
     //保存think之后需要调用的工具
     private ChatResponse toolCallResponse;
 
+
     //工具调用管理者
     private final ToolCallingManager toolCallingManager;
 
@@ -59,6 +60,8 @@ public class ToolCallAgent extends ReActAgent {
                                               .withProxyToolCalls(true)
                                               .build();
     }
+
+
 
     /**
      * 处理当前状态决定工具调用
@@ -79,8 +82,10 @@ List<Message> messageList = getMessageList();
         //调用AI大模型，获取结果
 
         try {
-            ChatResponse chatResponse = getChatClient().prompt(prompt)
+            ChatResponse chatResponse = getChatClient()
+                    .prompt(prompt)
                     .system(getSystemPrompt())
+//                    .tools(toolCallbackProvider)
                     .tools(availableTools)
                     .call()
                     .chatResponse();
@@ -88,7 +93,7 @@ List<Message> messageList = getMessageList();
             //解析工具调用结果，获取调用工具
             AssistantMessage assistantMessage = chatResponse.getResult().getOutput();
             String result = assistantMessage.getText();
-
+            log.info("result的输出："+result);
             List<AssistantMessage.ToolCall> toolCallList = assistantMessage.getToolCalls();
             log.info(getName()+"的思考："+ result);
             log.info(getName()+"选择了："+toolCallList.size()+"个工具");
@@ -119,19 +124,36 @@ List<Message> messageList = getMessageList();
     public String act() {
 
         if(!toolCallResponse.hasToolCalls()) return "没有工具调用";
+        AssistantMessage output = toolCallResponse.getResult().getOutput();
+        String text1 = output.getText();
+
 
         Prompt prompt = new Prompt(getMessageList(), this.chatOptions);
         ToolExecutionResult toolExecutionResult = toolCallingManager.executeToolCalls(prompt, toolCallResponse);
         //记录消息上下文,conversationHistory()已经包含了助手消息以及工具调用结果
         setMessageList(toolExecutionResult.conversationHistory());
         ToolResponseMessage last = (ToolResponseMessage)CollUtil.getLast(toolExecutionResult.conversationHistory());
-        String results = last.getResponses().stream().map(response -> "工具" + response.name() + "的返回结果：" + response.responseData())
+        String results = last.getResponses().stream().map(response ->"工具" + response.name() + "的返回结果：" +response.responseData())
                 .collect(Collectors.joining("\n"));
+
         boolean terminate = last.getResponses().stream().anyMatch(response -> response.name().equals("doTerminate"));
        if(terminate){
            setState(AgentState.FINISHED);
        }
         log.info(results);
-        return results;
+        String results1= text1+results;
+        return results1;
+    }
+
+    @Override
+    public String present() {
+
+        //解析工具调用结果，获取调用工具
+        AssistantMessage assistantMessage = this.toolCallResponse.getResult().getOutput();
+        String result = assistantMessage.getText();
+        if (StringUtil.isEmpty( result)){
+            return "思考开始";
+        }
+        return result;
     }
 }
