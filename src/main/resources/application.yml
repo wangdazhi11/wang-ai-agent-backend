@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: wang-ai-agent
+  datasource:
+    url: jdbc:postgresql://rm-cn-pj64drfcs00021uo.rwlb.rds.aliyuncs.com/wang_ai_agent
+    username: abc4429
+    password: Wang258369
+  ai:
+    dashscope:
+      api-key: "sk-bc00d696cc5947c6bdcf4554fb58755b"
+      chat:
+        options:
+          model: qwen-max
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: deepseek-r1:1.5b
+server:
+  port: 8123
+  servlet:
+    context-path: /api
+# springdoc-openapi
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.wangdazhi.wangaiagent.controller
+# knife4j
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+#searchApi
+search-api:
+  api-key: 9b3b94bbe22fd1d5d1ca257649f915d12436b3e98dd72e383393daf50ee24c27
